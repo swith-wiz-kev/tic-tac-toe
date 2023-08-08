@@ -127,3 +127,168 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+.bodydiv {
+  font-family: "Courier New", Courier, monospace;
+  background-color: black;
+  color: white;
+  background-image: radial-gradient(
+    circle,
+    rgb(80, 79, 79) 0%,
+    rgb(12, 12, 12) 100%
+  );
+  min-height: 100vh;
+  min-width: 100vw;
+  padding-top: 50px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+button {
+  color: rgb(43, 43, 43);
+  background-color: rgb(202, 202, 202);
+  font-family: inherit;
+}
+
+.settings {
+  width: 600px;
+  height: 300px;
+  background-color: rgb(46, 46, 46);
+  box-shadow: 0px 5px 5px 10px rgba(0, 0, 0, 0.284),
+    0px -2px 5px 10px rgba(0, 0, 0, 0.184);
+}
+
+.opponent,
+.setnames,
+.turns {
+  height: 32%;
+  margin: 1%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.settings .left {
+  width: 40%;
+  justify-content: center;
+  border-right: 2px dotted gray;
+  height: 60%;
+}
+
+.settings .right {
+  width: 60%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.right > * {
+  width: 100px;
+}
+
+.settings > .setnames {
+  border-top: 2px dotted gray;
+  border-bottom: 2px dotted gray;
+}
+
+.opponent.playerone,
+.opponent.playertwo {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.opponent .human,
+.opponent .ai {
+  display: flex;
+  flex-direction: row;
+}
+
+.setnames > span {
+  padding-right: 4px;
+}
+
+.turns.left {
+  flex-direction: column;
+  text-align: center;
+  font-size: 70%;
+}
+
+.turns.right > .turns {
+  justify-content: center;
+  text-align: center;
+}
+
+.gameboard {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  background-color: rgb(61, 61, 61);
+  box-shadow: 0px 5px 5px 10px rgba(0, 0, 0, 0.284),
+    0px -2px 5px 10px rgba(0, 0, 0, 0.184);
+  margin-top: 50px;
+  display: flex;
+  flex-direction: row;
+}
+
+.gamecontrol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 247px;
+  height: 80%;
+}
+
+.ai-state {
+  display: flex;
+  flex-direction: column;
+}
+
+.tictactoe-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tictactoe-grid {
+  width: 306px;
+  height: 306px;
+  display: grid;
+  grid-template-columns: 100px 106px 100px;
+  grid-template-rows: 100px 106px 100px;
+}
+
+.cell5 {
+  border: 3px solid black;
+}
+
+.cell2,
+.cell8 {
+  border-left: 3px solid black;
+  border-right: 3px solid black;
+}
+
+.cell4,
+.cell6 {
+  border-top: 3px solid black;
+  border-bottom: 3px solid black;
+}
+
+.tictactoe-status {
+  padding-top: 30px;
+  text-align: center;
+}
+
+.displaywinnerbg {
+  display: none;
+  position: absolute;
+  left: 76%;
+  top: 36%;
+  translate: (0, 0);
+  text-align: center;
+  font-size: 200%;
+}

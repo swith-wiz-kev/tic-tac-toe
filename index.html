@@ -7,5 +7,127 @@
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body></body>
+  <body>
+    <div class="bodydiv">
+      <div class="settings">
+        <div class="opponent">
+          <div class="opponent left">Control Select</div>
+          <div class="opponent right">
+            <div class="opponent playerone">
+              <div class="human playerone">
+                <input
+                  type="radio"
+                  name="player1type"
+                  id="p1human"
+                  value="p1human"
+                  checked="checked"
+                /><label for="p1human">Human</label>
+              </div>
+              <div class="ai playerone">
+                <input
+                  type="radio"
+                  name="player1type"
+                  id="p1ai"
+                  value="p1ai"
+                /><label for="p1ai">AI</label>
+              </div>
+            </div>
+            <div class="opponent playertwo">
+              <div class="human playertwo">
+                <input
+                  type="radio"
+                  name="player2type"
+                  id="p2human"
+                  value="p2human"
+                /><label for="p1human">Human</label>
+              </div>
+              <div class="ai playertwo">
+                <input
+                  type="radio"
+                  name="player2type"
+                  id="p2ai"
+                  value="p2ai"
+                  checked="checked"
+                /><label for="p2ai">AI</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setnames">
+          <div class="setnames left">Set Names</div>
+          <div class="setnames right">
+            <div class="setnames playerone">
+              <span>Player1</span
+              ><button class="editp1" type="button">🖊️</button>
+            </div>
+            <div class="setnames playertwo">
+              <span>Player2</span
+              ><button class="editp2" type="button">🖊️</button>
+            </div>
+          </div>
+        </div>
+        <div class="turns">
+          <div class="turns left">
+            <button class="swap" type="button">swap X and O</button>
+            <div>Only available before Move #1</div>
+          </div>
+          <div class="turns right">
+            <div class="turns playerone">
+              1st Turn <br />
+              X
+            </div>
+
+            <div class="turns playertwo">O</div>
+          </div>
+        </div>
+      </div>
+      <div class="gameboard">
+        <div class="gamecontrol">
+          <button class="restart" type="button">restart</button>
+          <div class="ai-state">
+            <div class="runai">
+              <input
+                type="radio"
+                name="aistate"
+                id="runai"
+                value="runai"
+              /><label for="runai">Run AI</label>
+            </div>
+            <div class="pauseai">
+              <input
+                type="radio"
+                name="aistate"
+                id="pauseai"
+                value="pauseai"
+                checked="checked"
+              /><label for="pauseai">Pause AI</label>
+            </div>
+          </div>
+        </div>
+        <div class="tictactoe-area">
+          <div class="tictactoe-grid">
+            <div class="cell1" data-number="1"></div>
+            <div class="cell2" data-number="2"></div>
+            <div class="cell3" data-number="3"></div>
+            <div class="cell4" data-number="4"></div>
+            <div class="cell5" data-number="5"></div>
+            <div class="cell6" data-number="6"></div>
+            <div class="cell7" data-number="7"></div>
+            <div class="cell8" data-number="8"></div>
+            <div class="cell9" data-number="9"></div>
+          </div>
+          <div class="tictactoe-status">
+            Player1's Turn <br />
+            Move #1
+          </div>
+        </div>
+        <div class="displaywinnerbg">
+          <div class="displaywinnermsg">
+            Player1 <br />
+            wins!
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
