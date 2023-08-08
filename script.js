@@ -61,11 +61,20 @@ const initGame = (() => {
 const gameBoard = (() => {
   let moveNumber = 1;
   let boardContent = [];
+  let activePlayer = "P1"; //change to func later
   for (let index = 0; index < 9; index++) {
     boardContent[index] = "";
   }
 
   let currentMarker = "X";
+
+  function toggleMarker() {
+    if (currentMarker === "X") {
+      currentMarker = "O";
+    } else {
+      currentMarker = "X";
+    }
+  }
 
   function fillCell(cellNumber, currentMarker) {
     const targetCell = document.querySelector(`[data-number="${cellNumber}"]`);
@@ -90,10 +99,21 @@ const gameBoard = (() => {
       displayGameStatus.updateText();
     }
     moveNumber++;
-    displayGameStatus.updateText();
+    toggleMarker();
+    let currentPlayer = "";
+    if (activePlayer === "P1") {
+      activePlayer = "P2";
+      currentPlayer = displayP2Name.getText();
+    } else {
+      activePlayer = "P1";
+      currentPlayer = displayP1Name.getText();
+    }
+    const textGameStatus = `${currentPlayer}'s Turn \n Move #${moveNumber}`;
+    displayGameStatus.updateText(textGameStatus);
   };
 
   return {
+    boardContent,
     handleMove,
     handleMoveEnd,
   };
@@ -105,6 +125,7 @@ const display = (className) => {
     getComputedStyle(displayElement).getPropertyValue("display");
 
   const updateText = (text) => {
+    displayElement.style.whiteSpace = "pre";
     displayElement.textContent = text;
   };
 
