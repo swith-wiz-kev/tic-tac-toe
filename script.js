@@ -1,19 +1,101 @@
-const gameBoard = gameboardModule(() => {
-  let boardState = [];
+/*
+multiple
 
-  const initializeBoard = () => {
-    createCells();
-    assignCells();
+vars
+
+players
+  playermoves
+    move number
+    possible moves
+    location
+  isplayerturn
+  firstorsecond
+  playerpiece
+cells
+  content
+  related element
+editname
+  button
+  text
+isAiPaused
+isAiControl
+
+
+single
+
+vars
+
+turnstate
+controlstate
+aipausestate
+isGameEnd
+endResult
+
+
+
+
+*/
+
+const initGame = (() => {
+  const addButtonsFunction = () => {
+    function initializeButton(button) {
+      const buttonId = button.className;
+      const buttonFunction = "";
+      switch (buttonId) {
+        case "editp1":
+          buttonFunction = editNameOne;
+
+          break;
+
+        case "editp2":
+          buttonFunction = editNameTwo;
+          break;
+        case "swap":
+          buttonFunction = swapXO;
+          break;
+        case "restart":
+          buttonFunction = restartGame;
+          break;
+        default:
+          break;
+      }
+      button.addEventListener("click", buttonFunction);
+    }
+
+    function editNameOne(event) {}
+
+    function editNameTwo(event) {}
+
+    function swapXO(event) {}
+
+    function restartGame(event) {}
+
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach(initializeButton);
   };
-  const initializeSettings = () => {
-    getOpponent();
-    getFirstTurn();
+
+  const addCellsFunction = () => {
+    function cellClick() {}
+
+    const cells = document.querySelectorAll(".tictactoe-grid>div");
+    cells.forEach((cell) => {
+      cell.addEventListener("click", cellClick);
+    });
+  };
+
+  const watchControlSelectSetting = () => {
+    function pauseAI(params) {}
+    const inputControlSelect = document.querySelector(".opponent input");
+    inputControlSelect.addEventListener("input", pauseAI);
   };
   return {
-    initializeBoard,
-    initializeSettings,
+    addButtonsFunction,
+    addCellsFunction,
+    watchControlSelectSetting,
   };
 })();
 
-gameBoard.initializeBoard();
-gameBoard.initializeSettings();
+//init
+initGame.addButtonsFunction();
+initGame.addCellsFunction();
+initGame.watchControlSelectSetting();
