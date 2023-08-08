@@ -262,6 +262,13 @@ button {
   grid-template-rows: 100px 106px 100px;
 }
 
+.tictactoe-grid > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 75px;
+}
+
 .cell5 {
   border: 3px solid black;
 }
