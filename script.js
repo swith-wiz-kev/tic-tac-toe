@@ -1,65 +1,23 @@
-/*
-multiple
-
-vars
-
-players
-  playermoves
-    move number
-    possible moves
-    location
-  isplayerturn
-  firstorsecond
-  playerpiece
-cells
-  content
-  related element
-editname
-  button
-  text
-isAiPaused
-isAiControl
-
-
-single
-
-vars
-
-turnstate
-controlstate
-aipausestate
-isGameEnd
-endResult
-
-
-
-
-*/
-
 const initGame = (() => {
   const addButtonsFunction = () => {
-    function initializeButton(button) {
+    function addButtonsFunction(button) {
       const buttonId = button.className;
-      const buttonFunction = "";
       switch (buttonId) {
         case "editp1":
-          buttonFunction = editNameOne;
-
+          editNameOne();
           break;
-
         case "editp2":
-          buttonFunction = editNameTwo;
+          editNameTwo();
           break;
         case "swap":
-          buttonFunction = swapXO;
+          swapXO();
           break;
         case "restart":
-          buttonFunction = restartGame;
+          restartGame();
           break;
         default:
           break;
       }
-      button.addEventListener("click", buttonFunction);
     }
 
     function editNameOne(event) {}
@@ -71,11 +29,15 @@ const initGame = (() => {
     function restartGame(event) {}
 
     const buttons = document.querySelectorAll("button");
-    buttons.forEach(initializeButton);
+    buttons.forEach((button) =>
+      button.addEventListener("click", addButtonsFunction)
+    );
   };
 
   const addCellsFunction = () => {
-    function cellClick() {}
+    function cellClick(event) {
+      gameBoard.handleMove(event.target.dataset.number);
+    }
 
     const cells = document.querySelectorAll(".tictactoe-grid>div");
     cells.forEach((cell) => {
@@ -92,6 +54,35 @@ const initGame = (() => {
     addButtonsFunction,
     addCellsFunction,
     watchControlSelectSetting,
+  };
+})();
+
+const gameBoard = (() => {
+  let boardContent = [];
+  for (let index = 0; index < 9; index++) {
+    boardContent[index] = "";
+  }
+
+  let currentMarker = "X";
+
+  function fillCell(cellNumber, currentMarker) {
+    const targetCell = document.querySelector(`[data-number="${cellNumber}"]`);
+    targetCell.textContent = currentMarker;
+    boardContent[cellNumber - 1] = currentMarker;
+  }
+
+  const handleMove = (cellNumber) => {
+    if (boardContent[cellNumber - 1] === "") {
+      fillCell(cellNumber, currentMarker);
+      gameBoard.handleMoveEnd();
+    }
+  };
+
+  const handleMoveEnd = () => {};
+
+  return {
+    handleMove,
+    handleMoveEnd,
   };
 })();
 
