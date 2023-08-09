@@ -82,7 +82,36 @@ const gameBoard = (() => {
     boardContent[cellNumber - 1] = currentMarker;
   }
 
-  function isEnd() {}
+  function isEnd() {
+    function checkWinConditions(marker) {
+      for (let index = 0; index < winConditions.length; index++) {
+        const winCondition = winConditions[index].split("");
+        let matchedCount = 0;
+        winCondition.forEach((cellnumber) => {
+          if (boardContent[cellnumber - 1] === marker) {
+            matchedCount++;
+            console.log({ marker, cellnumber, matchedCount });
+          }
+        });
+        if (matchedCount === 3) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    const winConditions = [
+      "123",
+      "456",
+      "789",
+      "147",
+      "258",
+      "369",
+      "159",
+      "357",
+    ];
+    return checkWinConditions("X") || checkWinConditions("O");
+  }
 
   function showEndMessage() {}
 
@@ -95,8 +124,9 @@ const gameBoard = (() => {
 
   const handleMoveEnd = () => {
     if (isEnd()) {
+      displayGameStatus.toggleText();
       displayWinMsg.toggleText();
-      displayGameStatus.updateText();
+      displayWinMsg.updateText("Player2\n wins!");
     }
     moveNumber++;
     toggleMarker();
@@ -108,7 +138,7 @@ const gameBoard = (() => {
       activePlayer = "P1";
       currentPlayer = displayP1Name.getText();
     }
-    const textGameStatus = `${currentPlayer}'s Turn \n Move #${moveNumber}`;
+    const textGameStatus = `${currentPlayer}'s Turn\nMove #${moveNumber}`;
     displayGameStatus.updateText(textGameStatus);
   };
 
@@ -119,13 +149,12 @@ const gameBoard = (() => {
   };
 })();
 
-const display = (className) => {
+const display = (className, initialText) => {
   const displayElement = document.querySelector(className);
   const currentState =
     getComputedStyle(displayElement).getPropertyValue("display");
-
+  displayElement.textContent = initialText;
   const updateText = (text) => {
-    displayElement.style.whiteSpace = "pre";
     displayElement.textContent = text;
   };
 
@@ -148,12 +177,15 @@ const display = (className) => {
   };
 };
 
-const displayGameStatus = display(".tictactoe-status");
-const displayWinMsg = display(".displaywinnerbg");
-const displayP1Name = display(".setnames.playerone>span");
-const displayP2Name = display(".setnames.playertwo>span");
-const displayP1Turns = display(".turns.playerone");
-const displayP2Turns = display(".turns.playertwo");
+const displayGameStatus = display(
+  ".tictactoe-status>span",
+  "Player1's Turn\nMove #1"
+);
+const displayWinMsg = display(".displaywinnermsg>span", "Player1\nwins!");
+const displayP1Name = display(".setnames.playerone>span", "Player1");
+const displayP2Name = display(".setnames.playertwo>span", "Player2");
+const displayP1Turns = display(".turns.playerone>span", "1st Turn\nX");
+const displayP2Turns = display(".turns.playertwo>span", "O");
 
 //init
 initGame.addButtonsFunction();

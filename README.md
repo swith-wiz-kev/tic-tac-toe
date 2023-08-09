@@ -8,3 +8,5 @@ init module
 gameBoard Factory
 fillCell function
 display Factory
+turnEnd functionality
+winpatterncheck functionality

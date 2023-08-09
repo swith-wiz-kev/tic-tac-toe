@@ -249,9 +249,11 @@ button {
 
 .tictactoe-area {
   display: flex;
+  margin-top: 25px;
+  position: relative;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
 }
 
 .tictactoe-grid {
@@ -286,16 +288,30 @@ button {
 }
 
 .tictactoe-status {
-  padding-top: 30px;
+  position: absolute;
+  top: 320px;
+  left: 87px;
   text-align: center;
 }
 
 .displaywinnerbg {
-  display: none;
   position: absolute;
-  left: 76%;
+  left: 70%;
   top: 36%;
   translate: (0, 0);
   text-align: center;
   font-size: 200%;
+}
+
+.displaywinnermsg > span {
+  display: none;
+}
+
+.tictactoe-status > span,
+.displaywinnerbg > span,
+.setnames.playerone > span,
+.setnames.playertwo > span,
+.turns.playerone > span,
+.turns.playertwo > span {
+  white-space: pre-line;
 }
