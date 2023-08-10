@@ -10,3 +10,9 @@ fillCell function
 display Factory
 turnEnd functionality
 winpatterncheck functionality
+restart game functionality
+update interface functionality
+pause AI interface
+swap button functionality
+
+next: set names

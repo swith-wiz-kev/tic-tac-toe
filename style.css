@@ -303,7 +303,8 @@ button {
   font-size: 200%;
 }
 
-.displaywinnermsg > span {
+.displaywinnermsg > span,
+.pauseai > span {
   display: none;
 }
 
