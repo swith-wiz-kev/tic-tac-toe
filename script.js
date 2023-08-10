@@ -1,8 +1,8 @@
 "use strict";
 const initGame = (() => {
   const addButtonsFunction = () => {
-    function addButtonsFunction(button) {
-      const buttonId = button.className;
+    function addButtonsFunction(event) {
+      const buttonId = event.target.className;
       switch (buttonId) {
         case "editp1":
           editNameOne();
@@ -27,7 +27,9 @@ const initGame = (() => {
 
     function swapXO(event) {}
 
-    function restartGame(event) {}
+    function restartGame() {
+      gameBoard.resetValues();
+    }
 
     const buttons = document.querySelectorAll("button");
     buttons.forEach((button) =>
@@ -61,28 +63,23 @@ const initGame = (() => {
 const gameBoard = (() => {
   let moveNumber = 1;
   let boardContent = [];
-  let activePlayer = "P1"; //change to func later
   for (let index = 0; index < 9; index++) {
     boardContent[index] = "";
   }
 
+  const readBoard = () => {
+    return boardContent;
+  };
+
+  let activePlayer = "P1"; //change to func later
+
   let currentMarker = "X";
 
-  function toggleMarker() {
-    if (currentMarker === "X") {
-      currentMarker = "O";
-    } else {
-      currentMarker = "X";
-    }
-  }
+  let winPlayer = "";
 
-  function fillCell(cellNumber, currentMarker) {
-    const targetCell = document.querySelector(`[data-number="${cellNumber}"]`);
-    targetCell.textContent = currentMarker;
-    boardContent[cellNumber - 1] = currentMarker;
-  }
+  let gameEnd = 0;
 
-  function isEnd() {
+  function isWin() {
     function checkWinConditions(marker) {
       for (let index = 0; index < winConditions.length; index++) {
         const winCondition = winConditions[index].split("");
@@ -90,7 +87,6 @@ const gameBoard = (() => {
         winCondition.forEach((cellnumber) => {
           if (boardContent[cellnumber - 1] === marker) {
             matchedCount++;
-            console.log({ marker, cellnumber, matchedCount });
           }
         });
         if (matchedCount === 3) {
@@ -110,42 +106,107 @@ const gameBoard = (() => {
       "159",
       "357",
     ];
+
     return checkWinConditions("X") || checkWinConditions("O");
   }
 
-  function showEndMessage() {}
-
   const handleMove = (cellNumber) => {
-    if (boardContent[cellNumber - 1] === "" && !isEnd()) {
-      fillCell(cellNumber, currentMarker);
-      gameBoard.handleMoveEnd();
+    if (boardContent[cellNumber - 1] === "" && !gameEnd) {
+      boardContent[cellNumber - 1] = currentMarker;
+      handleMoveEnd();
     }
   };
 
-  const handleMoveEnd = () => {
-    if (isEnd()) {
-      displayGameStatus.toggleText();
-      displayWinMsg.toggleText();
-      displayWinMsg.updateText("Player2\n wins!");
+  function handleMoveEnd() {
+    function otherValue(currentValue, value1, value2) {
+      if (currentValue == value1) {
+        return value2;
+      } else {
+        return value1;
+      }
     }
+
+    function isDraw() {
+      return moveNumber === 10;
+    }
+
+    function ownerOf(marker) {
+      if (marker == "X") {
+        return "P1";
+      } else if (marker == "O") {
+        return "P2";
+      }
+    }
+
     moveNumber++;
-    toggleMarker();
+
+    if (isWin()) {
+      gameEnd = 1;
+      winPlayer = ownerOf(currentMarker);
+    } else if (isDraw()) {
+      gameEnd = 1;
+      winPlayer = "";
+    } else {
+      currentMarker = otherValue(currentMarker, "X", "O");
+      activePlayer = otherValue(activePlayer, "P1", "P2");
+    }
+    updateInterface();
+  }
+
+  const resetValues = () => {
+    moveNumber = 1;
+    for (let index = 0; index < 9; index++) {
+      boardContent[index] = "";
+    }
+    activePlayer = "P1"; //change to func later
+    currentMarker = "X";
+    winPlayer = "";
+    gameEnd = 0;
+    updateInterface();
+  };
+
+  function updateInterface() {
+    for (let cellNumber = 1; cellNumber <= 9; cellNumber++) {
+      const targetCell = document.querySelector(
+        `[data-number="${cellNumber}"]`
+      );
+      targetCell.textContent = boardContent[cellNumber - 1];
+    }
+
     let currentPlayer = "";
     if (activePlayer === "P1") {
-      activePlayer = "P2";
-      currentPlayer = displayP2Name.getText();
-    } else {
-      activePlayer = "P1";
       currentPlayer = displayP1Name.getText();
+    } else {
+      currentPlayer = displayP2Name.getText();
     }
     const textGameStatus = `${currentPlayer}'s Turn\nMove #${moveNumber}`;
     displayGameStatus.updateText(textGameStatus);
-  };
+    displayGameStatus.toggleText(1);
+    displayWinMsg.toggleText(0);
+
+    if (gameEnd) {
+      displayGameStatus.toggleText(0);
+      displayWinMsg.toggleText(1);
+      let winMsg = "";
+      if (winPlayer === "P1" || winPlayer === "P2") {
+        let winPlayerName = "";
+        if (winPlayer === "P1") {
+          winPlayerName = displayP1Name.getText();
+        } else if (winPlayer === "P2") {
+          winPlayerName = displayP2Name.getText();
+        }
+        winMsg = winPlayerName + "\nwins!";
+      } else {
+        winMsg = "Draw";
+      }
+      displayWinMsg.updateText(winMsg);
+    }
+  }
 
   return {
-    boardContent,
+    readBoard,
     handleMove,
-    handleMoveEnd,
+    resetValues,
   };
 })();
 
@@ -158,8 +219,12 @@ const display = (className, initialText) => {
     displayElement.textContent = text;
   };
 
-  const toggleText = () => {
-    if (currentState === "none") {
+  const toggleText = (value) => {
+    if (value == 0 || value == false) {
+      displayElement.style.display = "none";
+    } else if (value == 1 || value == true) {
+      displayElement.style.display = "block";
+    } else if (value === undefined && currentState === "none") {
       displayElement.style.display = "block";
     } else {
       displayElement.style.display = "none";
