@@ -24,9 +24,13 @@ const initGame = (() => {
       }
     }
 
-    function editNameOne(event) {}
+    function editNameOne() {
+      playerOne.editName();
+    }
 
-    function editNameTwo(event) {}
+    function editNameTwo() {
+      playerTwo.editName();
+    }
 
     function swapXO() {
       gameBoard.swapTurn();
@@ -75,7 +79,8 @@ const playerFactory = (
 ) => {
   let name = initialName;
   let marker = initialMarker;
-
+  const textElement = document.querySelector(nameTextElement);
+  let editingName = 0;
   const getMarker = () => {
     return marker;
   };
@@ -87,10 +92,36 @@ const playerFactory = (
       markerTextElement.updateText("First Turn\nX");
     }
   };
+
+  const editName = () => {
+    function otherValue(currentValue, value1, value2) {
+      if (currentValue == value1) {
+        return value2;
+      } else {
+        return value1;
+      }
+    }
+    editingName = otherValue(editingName, 0, 1);
+    textElement.classList.toggle("editing");
+    textElement.readOnly = !editingName;
+    if (editingName) {
+      textElement.focus();
+      const temp = textElement.value;
+      textElement.value = "";
+      textElement.value = temp; //moving cursor to the right
+    } else {
+      textElement.scrollLeft = 0; //Scrolling to left incase overflow
+    }
+  };
+  const getTextElement = () => {
+    return textElement;
+  };
   return {
     name,
     getMarker,
     setMarker,
+    editName,
+    getTextElement,
   };
 };
 
@@ -131,14 +162,22 @@ const displayGameStatus = display(
   "Player1's Turn\nMove #1"
 );
 const displayWinMsg = display(".displaywinnermsg>span", "Player1\nwins!");
-const displayP1Name = display(".setnames.playerone>span", "Player1");
-const displayP2Name = display(".setnames.playertwo>span", "Player2");
 const displayP1Turns = display(".turns.playerone>span", "1st Turn\nX");
 const displayP2Turns = display(".turns.playertwo>span", "O");
 const displayAiPaused = display(".pauseai>span", "AI Paused");
 
-const playerOne = playerFactory("Player1", "X", displayP1Name, displayP1Turns);
-const playerTwo = playerFactory("Player2", "O", displayP2Name, displayP2Turns);
+const playerOne = playerFactory(
+  "Player1",
+  "X",
+  ".setnames.playerone > input",
+  displayP1Turns
+);
+const playerTwo = playerFactory(
+  "Player2",
+  "O",
+  ".setnames.playertwo > input",
+  displayP2Turns
+);
 
 const gameBoard = (() => {
   let moveNumber = 1;
@@ -260,6 +299,15 @@ const gameBoard = (() => {
       displayWinMsg.toggleText(0);
     }
   }
+
+  function editNameEventFunction(player) {
+    player.getTextElement().addEventListener("input", (event) => {
+      player.name = event.target.value;
+      updateInterface();
+    });
+  }
+  editNameEventFunction(playerTwo);
+  editNameEventFunction(playerOne);
 
   return {
     readBoard,

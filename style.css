@@ -310,9 +310,27 @@ button {
 
 .tictactoe-status > span,
 .displaywinnerbg > span,
-.setnames.playerone > span,
-.setnames.playertwo > span,
 .turns.playerone > span,
 .turns.playertwo > span {
   white-space: pre-line;
+}
+
+.setnames.playerone > input,
+.setnames.playertwo > input {
+  width: 73px;
+  color: inherit;
+  background-color: #00000000;
+  border: 0px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+}
+
+.setnames.playerone > input:focus,
+.setnames.playertwo > input:focus {
+  outline: none;
+}
+
+.setnames.playerone > input.editing,
+.setnames.playertwo > input.editing {
+  background-color: #000000ff;
 }
