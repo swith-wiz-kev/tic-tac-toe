@@ -16,5 +16,6 @@ pause AI interface
 swap button functionality
 player factory
 change name span to input text
-
-next: set names,pause AI, AI moves
+set names
+pause AI
+next: AI moves

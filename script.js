@@ -17,7 +17,7 @@ const initGame = (() => {
           restartGame();
           break;
         case "resume":
-          pauseAi();
+          resumeAi();
           break;
         default:
           break;
@@ -36,10 +36,15 @@ const initGame = (() => {
       gameBoard.swapTurn();
     }
 
-    function pauseAi() {}
+    function resumeAi() {
+      gameBoard.setAiPause(0);
+      displayAiPaused.toggleText(0);
+      gameBoard.handleMove(10);
+    }
 
     function restartGame() {
       gameBoard.resetValues();
+      gameBoard.handleMove(10);
     }
 
     const buttons = document.querySelectorAll("button");
@@ -60,9 +65,31 @@ const initGame = (() => {
   };
 
   const watchControlSelectSetting = () => {
-    function pauseAI(params) {}
-    const inputControlSelect = document.querySelector(".opponent input");
-    inputControlSelect.addEventListener("input", pauseAI);
+    function pauseAI(event) {
+      if (event.target.value === "p1human") {
+        playerOne.inputControl = 0;
+      } else if (event.target.value === "p1ai") {
+        playerOne.inputControl = 1;
+      } else if (event.target.value === "p2human") {
+        playerTwo.inputControl = 0;
+      } else if (event.target.value === "p2ai") {
+        playerTwo.inputControl = 1;
+      }
+      gameBoard.setAiPause(1);
+      displayAiPaused.toggleText(1);
+    }
+    function initializeRadioButton(elementId, checked) {
+      const selector = document.getElementById(elementId);
+      selector.checked = checked;
+    }
+    initializeRadioButton("p1human", 1);
+    initializeRadioButton("p1ai", 0);
+    initializeRadioButton("p2human", 0);
+    initializeRadioButton("p2ai", 1);
+    const inputControlSelectors = document.querySelectorAll(".opponent input");
+    inputControlSelectors.forEach((inputControlSelector) => {
+      inputControlSelector.addEventListener("input", pauseAI);
+    });
   };
   return {
     addButtonsFunction,
@@ -73,13 +100,16 @@ const initGame = (() => {
 
 const playerFactory = (
   initialName,
+  initialInputControl,
   initialMarker,
   nameTextElement,
   markerTextElement
 ) => {
   let name = initialName;
+  let inputControl = initialInputControl;
   let marker = initialMarker;
   const textElement = document.querySelector(nameTextElement);
+  textElement.value = initialName;
   let editingName = 0;
   const getMarker = () => {
     return marker;
@@ -116,12 +146,27 @@ const playerFactory = (
   const getTextElement = () => {
     return textElement;
   };
+
+  const getMove = (boardContent) => {
+    const emptySpaces = boardContent
+      .map((cell, index) => {
+        return (cell == "") * (index + 1);
+      })
+      .filter((cellNumber) => {
+        return cellNumber > 0;
+      });
+    const moveTarget = Math.floor(Math.random() * emptySpaces.length);
+    return emptySpaces[moveTarget];
+  };
+
   return {
     name,
+    inputControl,
     getMarker,
     setMarker,
     editName,
     getTextElement,
+    getMove,
   };
 };
 
@@ -168,12 +213,14 @@ const displayAiPaused = display(".pauseai>span", "AI Paused");
 
 const playerOne = playerFactory(
   "Player1",
+  0,
   "X",
   ".setnames.playerone > input",
   displayP1Turns
 );
 const playerTwo = playerFactory(
   "Player2",
+  1,
   "O",
   ".setnames.playertwo > input",
   displayP2Turns
@@ -186,13 +233,13 @@ const gameBoard = (() => {
     boardContent[index] = "";
   }
 
-  const readBoard = () => {
-    return boardContent;
-  };
-  let winMsg = "Draw";
-  let gameEnd = 0;
+  let gameEnd = [0, 0]; //[isGameEnd, isNotDraw]
   const players = [playerOne, playerTwo];
   let activePlayer = 0 + (playerOne.getMarker() == "O"); // 0 = p1, 1 = p2
+  let isAiPaused = 0;
+  const setAiPause = (value) => {
+    isAiPaused = value;
+  };
 
   function otherValue(currentValue, value1, value2) {
     if (currentValue == value1) {
@@ -234,7 +281,14 @@ const gameBoard = (() => {
   }
 
   const handleMove = (cellNumber) => {
-    if (boardContent[cellNumber - 1] === "" && !gameEnd) {
+    if (!isAiPaused && players[activePlayer].inputControl && cellNumber == 10) {
+      //cellnumber 10 is AI move
+      handleMove(players[activePlayer].getMove(boardContent));
+    } else if (
+      boardContent[cellNumber - 1] === "" &&
+      !gameEnd[0] &&
+      cellNumber != 10
+    ) {
       boardContent[cellNumber - 1] = players[activePlayer].getMarker();
       handleMoveEnd();
     }
@@ -248,14 +302,14 @@ const gameBoard = (() => {
     moveNumber++;
 
     if (isWin()) {
-      gameEnd = 1;
-      winMsg = players[activePlayer].name + "\nwins!";
+      gameEnd = [1, 1];
     } else if (isDraw()) {
-      gameEnd = 1;
+      gameEnd = [1, 0];
     } else {
       activePlayer = otherValue(activePlayer, 0, 1);
     }
     updateInterface();
+    handleMove(10);
   }
 
   const swapTurn = () => {
@@ -275,8 +329,7 @@ const gameBoard = (() => {
       boardContent[index] = "";
     }
     activePlayer = 0 + (playerOne.getMarker() == "O");
-    winMsg = "Draw";
-    gameEnd = 0;
+    gameEnd = [0, 0];
     updateInterface();
   };
 
@@ -287,11 +340,16 @@ const gameBoard = (() => {
       );
       targetCell.textContent = boardContent[cellNumber - 1];
     }
-
-    if (gameEnd) {
+    if (gameEnd[0]) {
+      let tempWinMsg = "";
+      if (gameEnd[1]) {
+        tempWinMsg = players[activePlayer].name + "\nwins!";
+      } else {
+        tempWinMsg = "Draw";
+      }
       displayGameStatus.toggleText(0);
       displayWinMsg.toggleText(1);
-      displayWinMsg.updateText(winMsg);
+      displayWinMsg.updateText(tempWinMsg);
     } else {
       const textGameStatus = `${players[activePlayer].name}'s Turn\nMove #${moveNumber}`;
       displayGameStatus.updateText(textGameStatus);
@@ -310,10 +368,10 @@ const gameBoard = (() => {
   editNameEventFunction(playerOne);
 
   return {
-    readBoard,
     handleMove,
     resetValues,
     swapTurn,
+    setAiPause,
   };
 })();
 
