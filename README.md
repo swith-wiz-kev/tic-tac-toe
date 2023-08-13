@@ -18,4 +18,5 @@ player factory
 change name span to input text
 set names
 pause AI
-next: AI moves
+AI basic response functions and simulator
+next: AI moves analyzer

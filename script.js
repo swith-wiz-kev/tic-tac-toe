@@ -159,6 +159,173 @@ const playerFactory = (
     return emptySpaces[moveTarget];
   };
 
+  const getMove2 = (boardContent) => {
+    let moveList = readBoard(boardContent); // [5,"","",...,""]
+
+    function readBoard(board) {
+      let moveListTemp = [];
+      let counter = [1, 1];
+
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] == "X") {
+          moveListTemp[counter[0] * 2 - 2] = i + 1;
+          counter[0]++;
+        } else if (board[i] == "O") {
+          moveListTemp[counter[1] * 2 - 1] = i + 1;
+          counter[1]++;
+        }
+      }
+      return moveListTemp;
+    }
+
+    let moveLogger = [];
+    let moveLogger2 = [];
+
+    function bestMove(moveList, moveLogger) {
+      function getResult(resultSubArray, moveList) {
+        let resultInt = 0;
+        const markerX = moveList.length % 2 == 0; //1 = X turn  0 = O Turn
+
+        function checkCell(cell, cellNumber) {
+          if (cell == -1) {
+            //if cell empty
+            resultSubArray.push(cellNumber);
+            if (!emptyCells.includes(cellNumber)) {
+              emptyCells.push(cellNumber);
+            }
+          } else if (cell % 2 == !markerX) {
+            // if cell is your marker
+            resultInt += 1;
+          } else if (cell % 2 == markerX) {
+            // if cell is opponent marker
+            resultInt += 3;
+          }
+        }
+
+        checkCell(moveList.indexOf(resultSubArray[0]), resultSubArray[0]);
+        checkCell(moveList.indexOf(resultSubArray[1]), resultSubArray[1]);
+        checkCell(moveList.indexOf(resultSubArray[2]), resultSubArray[2]);
+
+        return resultInt;
+      }
+
+      let resultArr = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [1, 4, 7],
+        [2, 5, 8],
+        [3, 6, 9],
+        [1, 5, 9],
+        [3, 5, 7],
+      ];
+
+      let reportArr = [];
+
+      let emptyCells = [];
+
+      for (let index = 0; index < resultArr.length; index++) {
+        const result = getResult(resultArr[index], moveList);
+        if (result == 2) {
+          const temp = resultArr[index][3];
+          reportArr.push([10, temp]);
+          index = 10;
+        } else if (result == 6) {
+          const temp = resultArr[index][3];
+          reportArr.push([11, temp]);
+        }
+      }
+      if (reportArr.length == 0) {
+        reportArr.push([0, 0]); // filler to avoid undefined
+      }
+      function addEntry(entryType, cellNumber, moveLogger) {
+        if (moveLogger.length == 0) {
+          moveLogger[0] = [1, ""];
+        }
+        if (entryType <= 2) {
+          moveList.push(cellNumber);
+          const moveListTemp = moveList.slice();
+          moveLogger[moveLogger[0][0]] = moveListTemp;
+          if (entryType == 1) {
+            moveLogger[0][1] += "W" + (moveListTemp.length % 2);
+            const temp = moveLogger[0][1];
+            moveLogger[moveLogger[0][0]].push(temp);
+            if (moveLogger[0][1].slice(-4, -1) == "T W") {
+              const temp = moveLogger[moveLogger[0][0]].slice();
+              moveLogger2.push(temp);
+            }
+            moveLogger[0][1] = moveLogger[0][1].slice(0, -2);
+          } else if (entryType == 2) {
+            moveLogger[0][1] += "D";
+            const temp = moveLogger[0][1];
+            moveLogger[moveLogger[0][0]].push(temp);
+            moveLogger[0][1] = moveLogger[0][1].slice(0, -1);
+          }
+          moveList.pop();
+          moveLogger[0][0]++;
+        } else if (entryType == 3) {
+          moveLogger[0][1] += "T ";
+        } else if (entryType == 4) {
+          moveLogger[0][1] += "R ";
+        } else if (entryType == 5) {
+          moveLogger[0][1] = moveLogger[0][1].slice(0, -2);
+        }
+      }
+      if (reportArr[reportArr.length - 1][0] == 10) {
+        addEntry(1, reportArr[reportArr.length - 1][1], moveLogger);
+        return reportArr[reportArr.length - 1][1];
+      } else if (moveList.length == 8) {
+        addEntry(2, emptyCells[0], moveLogger);
+        return emptyCells[0];
+      } else if (
+        reportArr[reportArr.length - 1][0] == 11 &&
+        moveLogger.length == 0
+      ) {
+        return reportArr[reportArr.length - 1][1];
+      } else if (reportArr[reportArr.length - 1][0] == 11) {
+        const temp = reportArr[reportArr.length - 1][1];
+        moveList.push(temp);
+        addEntry(3, reportArr[reportArr.length - 1][1], moveLogger);
+        bestMove(moveList, moveLogger);
+        addEntry(5, "remove T", moveLogger);
+        moveList.pop();
+      } else {
+        const possibleMoves = emptyCells.slice();
+        for (let i = 0; i < possibleMoves.length; i++) {
+          moveList.push(possibleMoves[i]);
+          addEntry(4, possibleMoves[i], moveLogger);
+          bestMove(moveList, moveLogger);
+          addEntry(5, "remove R", moveLogger);
+          moveList.pop();
+          const lastSim =
+            moveLogger[moveLogger[0][0] - 1][
+              moveLogger[moveLogger[0][0] - 1].length - 1
+            ];
+          if (
+            lastSim.slice(-4, -1) == "T W" &&
+            possibleMoves[i] ==
+              moveLogger[moveLogger[0][0] - 1][
+                moveLogger[moveLogger[0][0] - 1].length - 4
+              ]
+          ) {
+            return possibleMoves[i];
+          }
+          // return analyzedMove()
+        }
+      }
+    }
+
+    function analyze(params) {}
+
+    if (moveList.length == 0) {
+      moveList[0] = Math.floor(Math.random() * 9);
+    } else {
+      bestMove(moveList, moveLogger);
+      moveList[moveList.length] = analyze(moveLogger);
+    }
+
+    return 1;
+  };
   return {
     name,
     inputControl,
@@ -167,6 +334,7 @@ const playerFactory = (
     editName,
     getTextElement,
     getMove,
+    getMove2,
   };
 };
 
