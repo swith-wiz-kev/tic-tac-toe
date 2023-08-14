@@ -251,10 +251,6 @@ const playerFactory = (
             moveLogger[0][1] += "W" + (moveListTemp.length % 2);
             const temp = moveLogger[0][1];
             moveLogger[moveLogger[0][0]].push(temp);
-            if (moveLogger[0][1].slice(-4, -1) == "T W") {
-              const temp = moveLogger[moveLogger[0][0]].slice();
-              moveLogger2.push(temp);
-            }
             moveLogger[0][1] = moveLogger[0][1].slice(0, -2);
           } else if (entryType == 2) {
             moveLogger[0][1] += "D";
@@ -376,8 +372,8 @@ const playerFactory = (
     setMarker,
     editName,
     getTextElement,
-    getMove,
-    getMove2,
+    getMove, //random
+    getMove2, //best move
   };
 };
 
