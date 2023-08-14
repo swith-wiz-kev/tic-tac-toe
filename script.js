@@ -34,6 +34,7 @@ const initGame = (() => {
 
     function swapXO() {
       gameBoard.swapTurn();
+      gameBoard.handleMove(10);
     }
 
     function resumeAi() {
@@ -160,7 +161,7 @@ const playerFactory = (
   };
 
   const getMove2 = (boardContent) => {
-    let moveList = readBoard(boardContent); // [5,"","",...,""]
+    let moveList = readBoard(boardContent);
 
     function readBoard(board) {
       let moveListTemp = [];
@@ -179,7 +180,6 @@ const playerFactory = (
     }
 
     let moveLogger = [];
-    let moveLogger2 = [];
 
     function bestMove(moveList, moveLogger) {
       function getResult(resultSubArray, moveList) {
@@ -238,6 +238,7 @@ const playerFactory = (
       if (reportArr.length == 0) {
         reportArr.push([0, 0]); // filler to avoid undefined
       }
+
       function addEntry(entryType, cellNumber, moveLogger) {
         if (moveLogger.length == 0) {
           moveLogger[0] = [1, ""];
@@ -268,63 +269,105 @@ const playerFactory = (
         } else if (entryType == 4) {
           moveLogger[0][1] += "R ";
         } else if (entryType == 5) {
+          const tempString =
+            moveLogger[moveLogger[0][0] - 1][
+              moveLogger[moveLogger[0][0] - 1].length - 1
+            ];
+          moveLogger[moveLogger[0][0] - 1][
+            moveLogger[moveLogger[0][0] - 1].length - 1
+          ] =
+            tempString.slice(0, cellNumber) +
+            "S" +
+            tempString.slice(cellNumber + 1);
+        } else if (entryType == 99) {
           moveLogger[0][1] = moveLogger[0][1].slice(0, -2);
         }
       }
+
       if (reportArr[reportArr.length - 1][0] == 10) {
         addEntry(1, reportArr[reportArr.length - 1][1], moveLogger);
-        return reportArr[reportArr.length - 1][1];
+        return [reportArr[reportArr.length - 1][1], "W"];
       } else if (moveList.length == 8) {
         addEntry(2, emptyCells[0], moveLogger);
-        return emptyCells[0];
+        return [emptyCells[0], "D"];
       } else if (
         reportArr[reportArr.length - 1][0] == 11 &&
         moveLogger.length == 0
       ) {
-        return reportArr[reportArr.length - 1][1];
+        return [reportArr[reportArr.length - 1][1], "T"];
       } else if (reportArr[reportArr.length - 1][0] == 11) {
         const temp = reportArr[reportArr.length - 1][1];
         moveList.push(temp);
         addEntry(3, reportArr[reportArr.length - 1][1], moveLogger);
         bestMove(moveList, moveLogger);
-        addEntry(5, "remove T", moveLogger);
+        addEntry(99, "remove T", moveLogger);
         moveList.pop();
+        return [reportArr[reportArr.length - 1][1], "T"];
       } else {
         const possibleMoves = emptyCells.slice();
+        let newPossibleMoves = possibleMoves.slice();
+        const moveLoggerStartLength = moveLogger.length;
+
         for (let i = 0; i < possibleMoves.length; i++) {
           moveList.push(possibleMoves[i]);
           addEntry(4, possibleMoves[i], moveLogger);
-          bestMove(moveList, moveLogger);
-          addEntry(5, "remove R", moveLogger);
+          const bestMoveNumber = bestMove(moveList, moveLogger);
+          addEntry(99, "remove R", moveLogger);
           moveList.pop();
+          const currentMarker = (moveList.length + 1) % 2; //0:X, 1:O
           const lastSim =
             moveLogger[moveLogger[0][0] - 1][
               moveLogger[moveLogger[0][0] - 1].length - 1
             ];
-          if (
-            lastSim.slice(-4, -1) == "T W" &&
-            possibleMoves[i] ==
-              moveLogger[moveLogger[0][0] - 1][
-                moveLogger[moveLogger[0][0] - 1].length - 4
-              ]
-          ) {
-            return possibleMoves[i];
+          if (bestMoveNumber != undefined) {
+            if (bestMoveNumber[1] == "S") {
+              newPossibleMoves.splice(
+                newPossibleMoves.indexOf(possibleMoves[i]),
+                1
+              );
+              moveLogger.pop();
+              moveLogger[0][0]--;
+            } else if (lastSim.slice(-2) == "W" + currentMarker) {
+              const cellNumberLog =
+                (moveLogger[moveLogger[0][0] - 1].length -
+                  1 -
+                  moveList.length) *
+                -2;
+              addEntry(5, cellNumberLog, moveLogger);
+              const invalidCount =
+                moveLogger.length - moveLoggerStartLength - 1;
+              moveLogger.splice(moveLoggerStartLength, invalidCount);
+              moveLogger[0][0] -= invalidCount;
+              return [possibleMoves[i], "S"];
+            } else if (lastSim.slice(-2) == "W" + (0 + !currentMarker)) {
+              newPossibleMoves.splice(
+                newPossibleMoves.indexOf(possibleMoves[i]),
+                1
+              );
+              moveLogger.pop();
+              moveLogger[0][0]--;
+            }
           }
-          // return analyzedMove()
+        }
+        if (moveList.length == finalAnswer - 1 && newPossibleMoves.length > 0) {
+          const randomMove = Math.floor(
+            Math.random() * newPossibleMoves.length
+          );
+          return [newPossibleMoves[randomMove], "R"];
+        } else if (moveList.length == finalAnswer - 1) {
+          return [possibleMoves[0], "L"];
         }
       }
     }
-
-    function analyze(params) {}
-
+    const finalAnswer = moveList.length + 1;
     if (moveList.length == 0) {
-      moveList[0] = Math.floor(Math.random() * 9);
+      moveList.push(Math.floor(Math.random() * 9) + 1);
     } else {
-      bestMove(moveList, moveLogger);
-      moveList[moveList.length] = analyze(moveLogger);
+      const finalMove = bestMove(moveList, moveLogger);
+      console.log(finalMove);
+      moveList.push(finalMove[0]);
     }
-
-    return 1;
+    return moveList[moveList.length - 1];
   };
   return {
     name,
@@ -451,7 +494,9 @@ const gameBoard = (() => {
   const handleMove = (cellNumber) => {
     if (!isAiPaused && players[activePlayer].inputControl && cellNumber == 10) {
       //cellnumber 10 is AI move
-      handleMove(players[activePlayer].getMove(boardContent));
+      handleMove(players[activePlayer].getMove2(boardContent));
+    } else if (isAiPaused && players[activePlayer].inputControl) {
+      // cellClick during AI move while AI paused
     } else if (
       boardContent[cellNumber - 1] === "" &&
       !gameEnd[0] &&

@@ -2,21 +2,4 @@ Tic-Tac-Toe
 
 Live Preview: https://swith-wiz-kev.github.io/tic-tac-toe/
 
-In this project, the UI makes use of simple buttons and radio buttons to modify the settings, reset, and trigger some game functionalities. There is also an edit button for changing a text to an input field and modifying its value as an input field. A few text elements will be changed, deleted or created as the game progresses.
-
-init module
-gameBoard Factory
-fillCell function
-display Factory
-turnEnd functionality
-winpatterncheck functionality
-restart game functionality
-update interface functionality
-pause AI interface
-swap button functionality
-player factory
-change name span to input text
-set names
-pause AI
-AI basic response functions and simulator
-next: AI moves analyzer
+In this project, the UI makes use of simple buttons and radio buttons to modify the settings, reset, and trigger some game functionalities. There is also an edit button for changing the name. A few text elements will be changed, hidden or made visible as the game progresses. The code makes us of factory and modules. The initialization of cell buttons and other inputs for game settings are done by a module. There is factory for the players, which is used to store or edit player data. The AI logic is also stored in the player factory. There is another factory for the displays, which is used to modify their text and toggle their visibility. The main game logic is stored in the gameboard module. The bulk of this module is the move handler, which takes input from clicking the cells or from a generated one by the AI logic. Private supporting functions for the move handler will control the display, determine if an input is valid, and check game state for every input made. Other functions of the gameboard includes resetting the game, changing X and O assignment, and pausing the AI.

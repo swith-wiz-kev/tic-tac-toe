@@ -170,6 +170,28 @@ button {
   align-items: center;
 }
 
+.opponent.left {
+  display: flex;
+  flex-direction: column;
+}
+
+.opponent .left.heading,
+.opponent .left.small {
+  display: flex;
+  white-space: pre;
+  text-align: center;
+  border-right: 0px;
+}
+
+.opponent .left.heading {
+  transform: translate(0, 20px);
+}
+
+.opponent .left.small {
+  transform: translate(0, 10px);
+  font-size: 70%;
+}
+
 .settings .left {
   width: 40%;
   justify-content: center;
