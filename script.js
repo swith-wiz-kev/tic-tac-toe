@@ -162,7 +162,9 @@ const playerFactory = (
 
   const getMove2 = (boardContent) => {
     let moveList = readBoard(boardContent);
-
+    if (moveList.length == 9) {
+      return 5;
+    }
     function readBoard(board) {
       let moveListTemp = [];
       let counter = [1, 1];
@@ -321,8 +323,6 @@ const playerFactory = (
                 newPossibleMoves.indexOf(possibleMoves[i]),
                 1
               );
-              moveLogger.pop();
-              moveLogger[0][0]--;
             } else if (lastSim.slice(-2) == "W" + currentMarker) {
               const cellNumberLog =
                 (moveLogger[moveLogger[0][0] - 1].length -
@@ -340,8 +340,6 @@ const playerFactory = (
                 newPossibleMoves.indexOf(possibleMoves[i]),
                 1
               );
-              moveLogger.pop();
-              moveLogger[0][0]--;
             }
           }
         }
@@ -360,7 +358,7 @@ const playerFactory = (
       moveList.push(Math.floor(Math.random() * 9) + 1);
     } else {
       const finalMove = bestMove(moveList, moveLogger);
-      console.log(finalMove);
+      console.log(finalMove); //W win, D draw, T block enemy win, S sure win , R random(non W D T S), L sure lose on any
       moveList.push(finalMove[0]);
     }
     return moveList[moveList.length - 1];
